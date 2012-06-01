@@ -4,8 +4,11 @@
 #include <QWidget>
 #include <QMenu>
 #include <QAction>
-#include <QSettings>
+#include <QSqlDatabase>
+#include <QFile>
 #include "ui_qnotes.h"
+
+#define DBFILE "QNotes.db"
 
 class QNotes: public QWidget
 {
@@ -13,6 +16,13 @@ class QNotes: public QWidget
 public:
     QNotes(QWidget *parent = 0);
     ~QNotes();
+
+    bool hasPassword() const { return _hasPassword; }
+    bool checkPassword(const QString &password);
+
+    bool dbExists() const { return QFile::exists(DBFILE); }
+    bool createDB();
+    bool openDB();
 
 private:
     Ui::QNotes *_ui;
@@ -27,7 +37,10 @@ private:
     QAction *_aboutAction;
     QAction *_exitAction;
 
-    QSettings *_settings;
+    QSqlDatabase _db;
+    bool _hasPassword;
+    QString _password;
+    QString _hash;
 };
 
 #endif // QNOTES_H
