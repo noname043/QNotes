@@ -108,15 +108,21 @@ void QNotes::loadNotes()
         note->setContent(q.value(2).toString());
         note->setCreated(q.value(3).toInt());
         note->setModified(q.value(4).toInt());
-        // TODO: encryption
+        // TODO: encryption, hex->strings
         _ui->notesList->addItem(note);
     }
 }
 
 void QNotes::editNote(QListWidgetItem *item)
 {
-    // TODO: saving note on accepted()
     Note *note = dynamic_cast<Note*>(item);
     NoteEditor *editor = new NoteEditor(note, this);
     editor->exec();
+    if (editor->result() == QDialog::Accepted)
+    {
+        QSqlQuery q;
+        // TODO: encryption, strings->hex
+        q.exec(QString("UPDATE Notes SET title='%1', content='%2', modified=%3 WHERE id=%4")
+               .arg(note->title(), note->content(), QString::number(note->modifiedTime()), QString::number(note->id())));
+    }
 }

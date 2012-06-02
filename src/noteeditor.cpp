@@ -38,7 +38,6 @@ NoteEditor::NoteEditor(Note *note, QWidget *parent):
 NoteEditor::~NoteEditor()
 {}
 
-// TODO: _note->_modified on accepted()
 void NoteEditor::updateNote()
 {
     _note->setTitle(_ui->title->text());
