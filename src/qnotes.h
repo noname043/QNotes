@@ -30,6 +30,9 @@ public:
 private slots:
     void addNote();
     void editNote(QListWidgetItem *item);
+    void enablePassword();
+    void changePassword();
+    void disablePassword();
 
 private:
     Ui::QNotes *_ui;

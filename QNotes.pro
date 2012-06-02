@@ -12,13 +12,16 @@ INCLUDEPATH += .
 SOURCES += src/main.cpp \
     src/qnotes.cpp \
     src/note.cpp \
-    src/noteeditor.cpp
+    src/noteeditor.cpp \
+    src/passworddialog.cpp
 
 HEADERS += \
     src/qnotes.h \
     src/note.h \
-    src/noteeditor.h
+    src/noteeditor.h \
+    src/passworddialog.h
 
 FORMS += \
     ui/qnotes.ui \
-    ui/noteeditor.ui
+    ui/noteeditor.ui \
+    ui/passworddialog.ui

@@ -7,6 +7,7 @@
 #include <QPushButton>
 #endif
 #include "noteeditor.h"
+#include "passworddialog.h"
 
 QNotes::QNotes(QWidget *parent):
     QWidget(parent),
@@ -24,6 +25,9 @@ QNotes::QNotes(QWidget *parent):
     _hasPassword(false)
 {
     _ui->setupUi(this);
+
+    _disablePasswordAction->setDisabled(true);
+    _changePasswordAction->setDisabled(true);
 
     _passwordMenu->addAction(_enablePasswordAction);
     _passwordMenu->addAction(_disablePasswordAction);
@@ -45,6 +49,9 @@ QNotes::QNotes(QWidget *parent):
 #endif
 
     connect(_addNoteAction, SIGNAL(triggered()), this, SLOT(addNote()));
+    connect(_enablePasswordAction, SIGNAL(triggered()), this, SLOT(enablePassword()));
+    connect(_changePasswordAction, SIGNAL(triggered()), this, SLOT(changePassword()));
+    connect(_disablePasswordAction, SIGNAL(triggered()), this, SLOT(disablePassword()));
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(_ui->notesList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
 
@@ -126,6 +133,7 @@ void QNotes::editNote(QListWidgetItem *item)
         q.exec(QString("UPDATE Notes SET title='%1', content='%2', modified=%3 WHERE id=%4")
                .arg(note->title(), note->content(), QString::number(note->modifiedTime()), QString::number(note->id())));
     }
+    delete editor;
 }
 
 void QNotes::addNote()
@@ -145,6 +153,35 @@ void QNotes::addNote()
         q.exec(QString("INSERT INTO Notes VALUES (%1, '%2', '%3', %4, %5)")
                .arg(QString::number(note->id()), note->title(), note->content(),
                     QString::number(note->createdTime()), QString::number(note->modifiedTime())));
-        qDebug(q.lastQuery().toStdString().c_str());
     }
+    else delete note;
+    delete editor;
 }
+
+void QNotes::enablePassword()
+{
+    PasswordDialog *dialog = new PasswordDialog(this);
+    dialog->exec();
+    if (dialog->result() == QDialog::Accepted)
+    {
+        _password = dialog->password();
+        _hash = QCryptographicHash::hash(_password.toStdString().c_str(), QCryptographicHash::Sha1);
+        _hasPassword = true;
+
+        QSqlQuery q;
+        q.exec(QString("UPDATE DBInfo SET isPasswordEnabled='true', password='%1'").arg(_hash));
+
+        // TODO: encrypt notes
+
+        _enablePasswordAction->setDisabled(true);
+        _changePasswordAction->setEnabled(true);
+        _disablePasswordAction->setEnabled(true);
+    }
+    delete dialog;
+}
+
+void QNotes::changePassword()
+{}
+
+void QNotes::disablePassword()
+{}
