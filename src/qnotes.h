@@ -42,8 +42,8 @@ private:
     QAction *_addNoteAction;
     QMenu *_passwordMenu;
     QAction *_enablePasswordAction;
-    QAction *_disablePasswordAction;
     QAction *_changePasswordAction;
+    QAction *_disablePasswordAction;
     QAction *_aboutAction;
     QAction *_exitAction;
 

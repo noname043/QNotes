@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QSqlResult>
 #include <QCryptographicHash>
+#include <QMessageBox>
 #ifdef Q_WS_SIMULATOR
 #include <QPushButton>
 #endif
@@ -17,8 +18,8 @@ QNotes::QNotes(QWidget *parent):
     _addNoteAction(new QAction(tr("Add note"), this)),
     _passwordMenu(new QMenu(tr("Password"), this)),
     _enablePasswordAction(new QAction(tr("Enable"), this)),
-    _disablePasswordAction(new QAction(tr("Disable"), this)),
     _changePasswordAction(new QAction(tr("Change"), this)),
+    _disablePasswordAction(new QAction(tr("Disable"), this)),
     _aboutAction(new QAction(tr("About"), this)),
     _exitAction(new QAction(tr("Exit"), this)),
     _db(QSqlDatabase::addDatabase("QSQLITE")),
@@ -30,8 +31,8 @@ QNotes::QNotes(QWidget *parent):
     _changePasswordAction->setDisabled(true);
 
     _passwordMenu->addAction(_enablePasswordAction);
-    _passwordMenu->addAction(_disablePasswordAction);
     _passwordMenu->addAction(_changePasswordAction);
+    _passwordMenu->addAction(_disablePasswordAction);
     _menu->addAction(_addNoteAction);
     _menu->addMenu(_passwordMenu);
     _menu->addAction(_aboutAction);
@@ -92,6 +93,10 @@ bool QNotes::openDB()
 
     _hasPassword = q.value(1).toBool();
     _hash = q.value(2).toString();
+
+    _enablePasswordAction->setDisabled(_hasPassword);
+    _changePasswordAction->setEnabled(_hasPassword);
+    _disablePasswordAction->setEnabled(_hasPassword);
 
     return true;
 }
@@ -181,7 +186,34 @@ void QNotes::enablePassword()
 }
 
 void QNotes::changePassword()
-{}
+{
+    PasswordDialog *dialog = new PasswordDialog(this);
+    dialog->exec();
+    if (dialog->result() == QDialog::Accepted)
+    {
+        QString newPassword = dialog->password();
+        _hash = QCryptographicHash::hash(newPassword.toStdString().c_str(), QCryptographicHash::Sha1).toHex();
+
+        // TODO: "recrypt" notes
+
+        _password = newPassword;
+        QSqlQuery q;
+        q.exec(QString("UPDATE DBInfo SET password='%1'").arg(_hash));
+    }
+    delete dialog;
+}
 
 void QNotes::disablePassword()
-{}
+{
+    if (QMessageBox::question(this, tr("QNotes"), tr("Do you really want to disable your password?"), QMessageBox::Yes, QMessageBox::No) ==
+            QMessageBox::Yes)
+    {
+        // TODO: decrypt notes
+        _hasPassword = false;
+        QSqlQuery q;
+        q.exec("UPDATE DBInfo SET isPasswordEnabled='false'");
+        _enablePasswordAction->setEnabled(true);
+        _changePasswordAction->setDisabled(true);
+        _disablePasswordAction->setDisabled(true);
+    }
+}
