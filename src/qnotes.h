@@ -28,6 +28,7 @@ public:
     void loadNotes();
 
 private slots:
+    void addNote();
     void editNote(QListWidgetItem *item);
 
 private:

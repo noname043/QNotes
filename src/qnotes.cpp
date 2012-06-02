@@ -44,6 +44,7 @@ QNotes::QNotes(QWidget *parent):
     button->setMenu(_menu);
 #endif
 
+    connect(_addNoteAction, SIGNAL(triggered()), this, SLOT(addNote()));
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(_ui->notesList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
 
@@ -124,5 +125,26 @@ void QNotes::editNote(QListWidgetItem *item)
         // TODO: encryption, strings->hex
         q.exec(QString("UPDATE Notes SET title='%1', content='%2', modified=%3 WHERE id=%4")
                .arg(note->title(), note->content(), QString::number(note->modifiedTime()), QString::number(note->id())));
+    }
+}
+
+void QNotes::addNote()
+{
+    Note *note = new Note;
+    note->setCreated(QDateTime::currentDateTime().toTime_t());
+    NoteEditor *editor = new NoteEditor(note, this);
+    editor->exec();
+    if (editor->result() == QDialog::Accepted)
+    {
+        _ui->notesList->addItem(note);
+        QSqlQuery q;
+        // TODO: encryption, strings->hex  v workaround for auto_increment, lol
+        q.exec("SELECT Count(1)+1 FROM Notes");
+        q.next();
+        note->setId(q.value(0).toInt());
+        q.exec(QString("INSERT INTO Notes VALUES (%1, '%2', '%3', %4, %5)")
+               .arg(QString::number(note->id()), note->title(), note->content(),
+                    QString::number(note->createdTime()), QString::number(note->modifiedTime())));
+        qDebug(q.lastQuery().toStdString().c_str());
     }
 }
