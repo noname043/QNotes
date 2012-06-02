@@ -6,7 +6,7 @@
 #ifdef Q_WS_SIMULATOR
 #include <QPushButton>
 #endif
-#include "note.h"
+#include "noteeditor.h"
 
 QNotes::QNotes(QWidget *parent):
     QWidget(parent),
@@ -45,6 +45,7 @@ QNotes::QNotes(QWidget *parent):
 #endif
 
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(_ui->notesList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
 
     _db.setDatabaseName(DBFILE);
 }
@@ -110,4 +111,12 @@ void QNotes::loadNotes()
         // TODO: encryption
         _ui->notesList->addItem(note);
     }
+}
+
+void QNotes::editNote(QListWidgetItem *item)
+{
+    // TODO: saving note on accepted()
+    Note *note = dynamic_cast<Note*>(item);
+    NoteEditor *editor = new NoteEditor(note, this);
+    editor->exec();
 }

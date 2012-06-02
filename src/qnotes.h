@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QSqlDatabase>
 #include <QFile>
+#include "note.h"
 #include "ui_qnotes.h"
 
 #define DBFILE "QNotes.db"
@@ -25,6 +26,9 @@ public:
     bool openDB();
 
     void loadNotes();
+
+private slots:
+    void editNote(QListWidgetItem *item);
 
 private:
     Ui::QNotes *_ui;
