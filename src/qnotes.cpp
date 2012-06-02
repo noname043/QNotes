@@ -19,7 +19,8 @@ QNotes::QNotes(QWidget *parent):
     _changePasswordAction(new QAction(tr("Change"), this)),
     _aboutAction(new QAction(tr("About"), this)),
     _exitAction(new QAction(tr("Exit"), this)),
-    _db(QSqlDatabase::addDatabase("QSQLITE"))
+    _db(QSqlDatabase::addDatabase("QSQLITE")),
+    _hasPassword(false)
 {
     _ui->setupUi(this);
 
@@ -42,6 +43,8 @@ QNotes::QNotes(QWidget *parent):
     button->setMenu(_menu);
 #endif
 
+    connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
     _db.setDatabaseName(DBFILE);
 }
 
@@ -61,6 +64,7 @@ bool QNotes::createDB()
     q.exec(QString("INSERT INTO DBInfo VALUES('%1', %2, 'false', '');").arg(qApp->applicationName(), qApp->applicationVersion()));
     q.exec("CREATE TABLE Notes (id int primary key, title varchar(60), content text, created varchar(16), modified varchar(16));");
 
+    _db.close();
     return true;
 }
 
@@ -71,13 +75,13 @@ bool QNotes::openDB()
 
     QSqlQuery q;
     if (!q.exec("SELECT appName, isPasswordEnabled, password FROM DBInfo") ||
-            q.value(1).toString() != qApp->applicationName())
+        !q.next() || q.value(0).toString() != qApp->applicationName())
     {
         return false;
     }
 
-    _hasPassword = q.value(2).toBool();
-    _hash = q.value(3).toString();
+    _hasPassword = q.value(1).toBool();
+    _hash = q.value(2).toString();
 
     return true;
 }
