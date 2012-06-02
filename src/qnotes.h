@@ -35,6 +35,13 @@ private slots:
     void disablePassword();
 
 private:
+    void encrypt(Note *note);
+    void decrypt(Note *note);
+    void updateNotes();
+    static void encrypt(QByteArray &data, const char *key);
+    static void decrypt(QByteArray &data, const char *key) { encrypt(data, key); }
+
+private:
     Ui::QNotes *_ui;
 
     QMenu *_menu;

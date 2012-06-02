@@ -73,7 +73,7 @@ bool QNotes::createDB()
     QSqlQuery q;
     q.exec("CREATE TABLE DBInfo (appName varchar(20), appVersion float, isPasswordEnabled boolean, password varchar(40));");
     q.exec(QString("INSERT INTO DBInfo VALUES('%1', %2, 'false', '');").arg(qApp->applicationName(), qApp->applicationVersion()));
-    q.exec("CREATE TABLE Notes (id int primary key, title varchar(60), content text, created int, modified int);");
+    q.exec("CREATE TABLE Notes (id int primary key, title varchar(240), content text, created int, modified int);");
 
     _db.close();
     return true;
@@ -104,7 +104,14 @@ bool QNotes::openDB()
 bool QNotes::checkPassword(const QString &password)
 {
     if (_hasPassword)
-        return _hash == QCryptographicHash::hash(QByteArray(password.toStdString().c_str()), QCryptographicHash::Sha1).toHex();
+    {
+        if (_hash == QCryptographicHash::hash(QByteArray(password.toStdString().c_str()), QCryptographicHash::Sha1).toHex())
+        {
+            _password = password;
+            return true;
+        }
+        else return false;
+    }
     return true;
 }
 
@@ -121,7 +128,7 @@ void QNotes::loadNotes()
         note->setContent(q.value(2).toString());
         note->setCreated(q.value(3).toInt());
         note->setModified(q.value(4).toInt());
-        // TODO: encryption, hex->strings
+        decrypt(note);
         _ui->notesList->addItem(note);
     }
 }
@@ -134,9 +141,10 @@ void QNotes::editNote(QListWidgetItem *item)
     if (editor->result() == QDialog::Accepted)
     {
         QSqlQuery q;
-        // TODO: encryption, strings->hex
+        encrypt(note);
         q.exec(QString("UPDATE Notes SET title='%1', content='%2', modified=%3 WHERE id=%4")
                .arg(note->title(), note->content(), QString::number(note->modifiedTime()), QString::number(note->id())));
+        decrypt(note);
     }
     delete editor;
 }
@@ -151,13 +159,15 @@ void QNotes::addNote()
     {
         _ui->notesList->addItem(note);
         QSqlQuery q;
-        // TODO: encryption, strings->hex  v workaround for auto_increment, lol
+        //               v--- workaround for auto_increment, lol
         q.exec("SELECT Count(1)+1 FROM Notes");
         q.next();
         note->setId(q.value(0).toInt());
+        encrypt(note);
         q.exec(QString("INSERT INTO Notes VALUES (%1, '%2', '%3', %4, %5)")
                .arg(QString::number(note->id()), note->title(), note->content(),
                     QString::number(note->createdTime()), QString::number(note->modifiedTime())));
+        decrypt(note);
     }
     else delete note;
     delete editor;
@@ -176,7 +186,7 @@ void QNotes::enablePassword()
         QSqlQuery q;
         q.exec(QString("UPDATE DBInfo SET isPasswordEnabled='true', password='%1'").arg(_hash));
 
-        // TODO: encrypt notes
+        updateNotes();
 
         _enablePasswordAction->setDisabled(true);
         _changePasswordAction->setEnabled(true);
@@ -191,12 +201,11 @@ void QNotes::changePassword()
     dialog->exec();
     if (dialog->result() == QDialog::Accepted)
     {
-        QString newPassword = dialog->password();
-        _hash = QCryptographicHash::hash(newPassword.toStdString().c_str(), QCryptographicHash::Sha1).toHex();
+        _password = dialog->password();
+        _hash = QCryptographicHash::hash(_password.toStdString().c_str(), QCryptographicHash::Sha1).toHex();
 
-        // TODO: "recrypt" notes
+        updateNotes();
 
-        _password = newPassword;
         QSqlQuery q;
         q.exec(QString("UPDATE DBInfo SET password='%1'").arg(_hash));
     }
@@ -208,12 +217,77 @@ void QNotes::disablePassword()
     if (QMessageBox::question(this, tr("QNotes"), tr("Do you really want to disable your password?"), QMessageBox::Yes, QMessageBox::No) ==
             QMessageBox::Yes)
     {
-        // TODO: decrypt notes
         _hasPassword = false;
         QSqlQuery q;
         q.exec("UPDATE DBInfo SET isPasswordEnabled='false'");
+
+        updateNotes();
+
         _enablePasswordAction->setEnabled(true);
         _changePasswordAction->setDisabled(true);
         _disablePasswordAction->setDisabled(true);
+    }
+}
+
+void QNotes::encrypt(QByteArray &data, const char *key)
+{
+    const char *k1 = key;
+    int k1len = (strlen(key)%2 ? strlen(key)/2 : strlen(key)/2+1);
+    const char *k2 = &key[k1len];
+    int k2len = strlen(key) - k1len;
+
+    for (int i = 0, j = 0, k = 0; i < data.size(); ++i, ++j, ++k)
+    {
+        if (j == k1len)
+            j = 0;
+        if (k == k2len)
+            k = 0;
+        data[i] = data[i] ^ k1[j];
+        data[i] = data[i] ^ k2[k];
+    }
+}
+
+void QNotes::decrypt(Note *note)
+{
+    QByteArray tmp;
+
+    tmp = QByteArray::fromHex(note->title().toStdString().c_str());
+    if (_hasPassword)
+        decrypt(tmp, _password.toStdString().c_str());
+    note->setTitle(tmp);
+
+    tmp = QByteArray::fromHex(note->content().toStdString().c_str());
+    if (_hasPassword)
+        decrypt(tmp, _password.toStdString().c_str());
+    note->setContent(tmp);
+}
+
+void QNotes::encrypt(Note *note)
+{
+    QByteArray tmp;
+
+    tmp = note->text().toStdString().c_str();
+    if (_hasPassword)
+        encrypt(tmp, _password.toStdString().c_str());
+    note->setTitle(tmp.toHex());
+
+    tmp = note->content().toStdString().c_str();
+    if (_hasPassword)
+        encrypt(tmp, _password.toStdString().c_str());
+    note->setContent(tmp.toHex());
+}
+
+void QNotes::updateNotes()
+{
+    QSqlQuery q;
+    Note *note;
+    for (int i = 0; i < _ui->notesList->count(); ++i)
+    {
+        // TODO: does it count from 1 or 0?
+        note = dynamic_cast<Note*>(_ui->notesList->item(i));
+        encrypt(note);
+        q.exec(QString("UPDATE Notes SET title='%1', content='%2' WHERE id=%3")
+               .arg(note->title(), note->content(), QString::number(note->id())));
+        decrypt(note);
     }
 }
