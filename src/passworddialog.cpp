@@ -17,6 +17,17 @@ PasswordDialog::PasswordDialog(QWidget *parent):
     connect(_okAction, SIGNAL(triggered()), this, SLOT(accept()));
     connect(_ui->password, SIGNAL(textEdited(QString)), this, SLOT(passwordChanged(QString)));
     connect(_ui->retype, SIGNAL(textEdited(QString)), this, SLOT(retypeChanged(QString)));
+
+    // Workaround for QtSimulator.
+#ifdef Q_WS_SIMULATOR
+    _button = new QPushButton(tr("Cancel"), this);
+    _ui->verticalLayout_3->addWidget(_button);
+    connect(_button, SIGNAL(clicked()), this, SLOT(reject()));
+    _button = new QPushButton(tr("Ok"), this);
+    _ui->verticalLayout_3->addWidget(_button);
+    connect(_button, SIGNAL(clicked()), this, SLOT(accept()));
+    _button->setEnabled(false);
+#endif
 }
 
 PasswordDialog::~PasswordDialog()
@@ -29,6 +40,7 @@ bool PasswordDialog::passwordChanged(const QString &text)
         _ui->status->setText(tr("Password too short."));
         return false;
     }
+    _ui->status->setText("");
     return true;
 }
 
@@ -44,5 +56,8 @@ bool PasswordDialog::retypeChanged(const QString &text)
     }
     else result = true;
     _okAction->setEnabled(result);
+#ifdef Q_WS_SIMULATOR
+    _button->setEnabled(result);
+#endif
     return result;
 }

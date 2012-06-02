@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QAction>
+#ifdef Q_WS_SIMULATOR
+#include <QPushButton>
+#endif
 #include "ui_passworddialog.h"
 
 class PasswordDialog: public QDialog
@@ -25,6 +28,9 @@ private:
     Ui::PasswordDialog *_ui;
     QAction *_cancelAction;
     QAction *_okAction;
+#ifdef Q_WS_SIMULATOR
+    QPushButton *_button;
+#endif
 };
 
 #endif // PASSWORDDIALOG_H

@@ -99,7 +99,7 @@ bool QNotes::openDB()
 bool QNotes::checkPassword(const QString &password)
 {
     if (_hasPassword)
-        return _hash == QCryptographicHash::hash(QByteArray(password.toStdString().c_str()), QCryptographicHash::Sha1);
+        return _hash == QCryptographicHash::hash(QByteArray(password.toStdString().c_str()), QCryptographicHash::Sha1).toHex();
     return true;
 }
 
@@ -165,7 +165,7 @@ void QNotes::enablePassword()
     if (dialog->result() == QDialog::Accepted)
     {
         _password = dialog->password();
-        _hash = QCryptographicHash::hash(_password.toStdString().c_str(), QCryptographicHash::Sha1);
+        _hash = QCryptographicHash::hash(_password.toStdString().c_str(), QCryptographicHash::Sha1).toHex();
         _hasPassword = true;
 
         QSqlQuery q;
