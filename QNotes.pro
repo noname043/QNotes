@@ -10,10 +10,12 @@ INCLUDEPATH += .
 
 # Input
 SOURCES += src/main.cpp \
-    src/qnotes.cpp
+    src/qnotes.cpp \
+    src/note.cpp
 
 HEADERS += \
-    src/qnotes.h
+    src/qnotes.h \
+    src/note.h
 
 FORMS += \
     ui/qnotes.ui

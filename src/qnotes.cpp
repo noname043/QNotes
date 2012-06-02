@@ -62,7 +62,7 @@ bool QNotes::createDB()
     QSqlQuery q;
     q.exec("CREATE TABLE DBInfo (appName varchar(20), appVersion float, isPasswordEnabled boolean, password varchar(40));");
     q.exec(QString("INSERT INTO DBInfo VALUES('%1', %2, 'false', '');").arg(qApp->applicationName(), qApp->applicationVersion()));
-    q.exec("CREATE TABLE Notes (id int primary key, title varchar(60), content text, created varchar(16), modified varchar(16));");
+    q.exec("CREATE TABLE Notes (id int primary key, title varchar(60), content text, created int, modified int);");
 
     _db.close();
     return true;
