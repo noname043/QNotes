@@ -140,6 +140,8 @@ void QNotes::editNote(QListWidgetItem *item)
     editor->exec();
     if (editor->result() == QDialog::Accepted)
     {
+        if (note->title().isEmpty())
+            note->setTitle(tr("Note #%1").arg(QString::number(note->id())));
         QSqlQuery q;
         encrypt(note);
         q.exec(QString("UPDATE Notes SET title='%1', content='%2', modified=%3 WHERE id=%4")
@@ -163,6 +165,8 @@ void QNotes::addNote()
         q.exec("SELECT Count(1)+1 FROM Notes");
         q.next();
         note->setId(q.value(0).toInt());
+        if (note->title().isEmpty())
+            note->setTitle(tr("Note #%1").arg(QString::number(note->id())));
         encrypt(note);
         q.exec(QString("INSERT INTO Notes VALUES (%1, '%2', '%3', %4, %5)")
                .arg(QString::number(note->id()), note->title(), note->content(),
