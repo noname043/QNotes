@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
+
+    notes.loadNotes();
+
 #if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     notes.showMaximized();
 #else

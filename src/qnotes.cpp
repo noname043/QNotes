@@ -6,6 +6,7 @@
 #ifdef Q_WS_SIMULATOR
 #include <QPushButton>
 #endif
+#include "note.h"
 
 QNotes::QNotes(QWidget *parent):
     QWidget(parent),
@@ -91,4 +92,22 @@ bool QNotes::checkPassword(const QString &password)
     if (_hasPassword)
         return _hash == QCryptographicHash::hash(QByteArray(password.toStdString().c_str()), QCryptographicHash::Sha1);
     return true;
+}
+
+void QNotes::loadNotes()
+{
+    QSqlQuery q;
+    Note *note;
+    q.exec("SELECT id, title, content, created, modified FROM Notes ORDER BY title");
+    while (q.next())
+    {
+        note = new Note;
+        note->setId(q.value(0).toInt());
+        note->setTitle(q.value(1).toString());
+        note->setContent(q.value(2).toString());
+        note->setCreated(q.value(3).toInt());
+        note->setModified(q.value(4).toInt());
+        // TODO: encryption
+        _ui->notesList->addItem(note);
+    }
 }

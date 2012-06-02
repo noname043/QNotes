@@ -24,6 +24,8 @@ public:
     bool createDB();
     bool openDB();
 
+    void loadNotes();
+
 private:
     Ui::QNotes *_ui;
 

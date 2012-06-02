@@ -8,7 +8,6 @@
 
 class Note: public QListWidgetItem
 {
-    Q_OBJECT
 public:
     Note();
     ~Note();
@@ -22,12 +21,12 @@ public:
     const QString &content() const { return _content; }
     void setContent(const QString &content) { _content = content; }
 
-    int created() const { return _created.toTime_t(); }
-    const QString &created() const { return _created.toString(DATETIMEFMT); }
+    int createdTime() const { return _created.toTime_t(); }
+    QString createdString() const { return _created.toString(DATETIMEFMT); }
     void setCreated(int created) { _created.setTime_t(created); }
 
-    int modified() const { return _modified.toTime_t(); }
-    const QString &modified() const { return _modified.toString(DATETIMEFMT); }
+    int modifiedTime() const { return _modified.toTime_t(); }
+    QString modifiedString() const { return _modified.toString(DATETIMEFMT); }
     void setModified(int modified) { _modified.setTime_t(modified); }
 
 private:
