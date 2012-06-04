@@ -9,6 +9,8 @@ PasswordDialog::PasswordDialog(QWidget *parent):
 {
     _ui->setupUi(this);
 
+    addAction(_cancelAction);
+    addAction(_okAction);
     _cancelAction->setSoftKeyRole(QAction::NegativeSoftKey);
     _okAction->setSoftKeyRole(QAction::PositiveSoftKey);
     _okAction->setDisabled(true);
