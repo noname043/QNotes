@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 
     if (notes.hasPassword())
     {
+        // TODO: Replace QInputDialog with something that hides password.
         QString password = QInputDialog::getText(0, QObject::tr("Enter password"), QObject::tr("Password:"), QLineEdit::Password);
         if (password.isNull())
             return 0;

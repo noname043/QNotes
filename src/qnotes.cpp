@@ -137,6 +137,9 @@ void QNotes::editNote(QListWidgetItem *item)
 {
     Note *note = dynamic_cast<Note*>(item);
     NoteEditor *editor = new NoteEditor(note, this);
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    editor->showMaximized();
+#endif
     editor->exec();
     if (editor->result() == QDialog::Accepted)
     {
@@ -156,6 +159,9 @@ void QNotes::addNote()
     Note *note = new Note;
     note->setCreated(QDateTime::currentDateTime().toTime_t());
     NoteEditor *editor = new NoteEditor(note, this);
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    editor->showMaximized();
+#endif
     editor->exec();
     if (editor->result() == QDialog::Accepted)
     {
@@ -180,6 +186,9 @@ void QNotes::addNote()
 void QNotes::enablePassword()
 {
     PasswordDialog *dialog = new PasswordDialog(this);
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    dialog->showMaximized();
+#endif
     dialog->exec();
     if (dialog->result() == QDialog::Accepted)
     {
@@ -202,6 +211,9 @@ void QNotes::enablePassword()
 void QNotes::changePassword()
 {
     PasswordDialog *dialog = new PasswordDialog(this);
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    dialog->showMaximized();
+#endif
     dialog->exec();
     if (dialog->result() == QDialog::Accepted)
     {
