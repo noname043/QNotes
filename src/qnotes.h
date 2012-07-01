@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QSettings>
 #include "note.h"
+#include "notelist.h"
 #include "ui_qnotes.h"
 
 #define DBFILE "QNotes.db"
@@ -45,6 +46,7 @@ private:
 
 private:
     Ui::QNotes *_ui;
+    NoteList *_noteList;
 
     QMenu *_menu;
     QAction *_menuAction;

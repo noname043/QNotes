@@ -11,6 +11,7 @@
 QNotes::QNotes(QWidget *parent):
     QWidget(parent),
     _ui(new Ui::QNotes),
+    _noteList(new NoteList(this)),
     _menu(new QMenu(tr("Menu"), this)),
     _menuAction(new QAction(tr("Menu"), this)),
     _addNoteAction(new QAction(tr("Add note"), this)),
@@ -25,6 +26,7 @@ QNotes::QNotes(QWidget *parent):
     _hasPassword(false)
 {
     _ui->setupUi(this);
+    _ui->gridLayout->addWidget(_noteList);
 
     _disablePasswordAction->setDisabled(true);
     _changePasswordAction->setDisabled(true);
@@ -46,7 +48,8 @@ QNotes::QNotes(QWidget *parent):
     connect(_changePasswordAction, SIGNAL(triggered()), this, SLOT(changePassword()));
     connect(_disablePasswordAction, SIGNAL(triggered()), this, SLOT(disablePassword()));
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(_ui->notesList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
+    connect(_noteList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
+    connect(_noteList, SIGNAL(editTriggered(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
 
     QString tmp;
     if (_settings.contains(DBPATH))
@@ -135,7 +138,7 @@ void QNotes::loadNotes()
         note->setCreated(q.value(3).toInt());
         note->setModified(q.value(4).toInt());
         decrypt(note);
-        _ui->notesList->addItem(note);
+        _noteList->addItem(note);
     }
 }
 
@@ -171,7 +174,7 @@ void QNotes::addNote()
     editor->exec();
     if (editor->result() == QDialog::Accepted)
     {
-        _ui->notesList->addItem(note);
+        _noteList->addItem(note);
         QSqlQuery q;
         //               v--- workaround for auto_increment, lol
         q.exec("SELECT Count(1)+1 FROM Notes");
@@ -303,10 +306,10 @@ void QNotes::updateNotes()
 {
     QSqlQuery q;
     Note *note;
-    for (int i = 0; i < _ui->notesList->count(); ++i)
+    for (int i = 0; i < _noteList->count(); ++i)
     {
         // TODO: does it count from 1 or 0?
-        note = dynamic_cast<Note*>(_ui->notesList->item(i));
+        note = dynamic_cast<Note*>(_noteList->item(i));
         encrypt(note);
         q.exec(QString("UPDATE Notes SET title='%1', content='%2' WHERE id=%3")
                .arg(note->title(), note->content(), QString::number(note->id())));
