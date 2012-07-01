@@ -4,9 +4,6 @@
 #include <QSqlResult>
 #include <QCryptographicHash>
 #include <QMessageBox>
-#ifdef Q_WS_SIMULATOR
-#include <QPushButton>
-#endif
 #include "noteeditor.h"
 #include "passworddialog.h"
 
@@ -41,13 +38,6 @@ QNotes::QNotes(QWidget *parent):
     _menuAction->setMenu(_menu);
     _menuAction->setIcon(qApp->style()->standardIcon(QStyle::SP_TitleBarMenuButton));
     _menuAction->setSoftKeyRole(QAction::PositiveSoftKey);
-
-    // Workaround for QtSimulator
-#ifdef Q_WS_SIMULATOR
-    QPushButton *button = new QPushButton(tr("Menu"), this);
-    button->setIcon(qApp->style()->standardIcon(QStyle::SP_TitleBarMenuButton));
-    button->setMenu(_menu);
-#endif
 
     connect(_addNoteAction, SIGNAL(triggered()), this, SLOT(addNote()));
     connect(_enablePasswordAction, SIGNAL(triggered()), this, SLOT(enablePassword()));

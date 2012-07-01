@@ -1,15 +1,12 @@
 #include "noteeditor.h"
-#include <QStyle>
-#ifdef Q_WS_SIMULATOR
-#include <QPushButton>
-#endif
+#include <QS60Style>
 
 NoteEditor::NoteEditor(Note *note, QWidget *parent):
     QDialog(parent),
     _ui(new Ui::NoteEditor),
     _note(note),
-    _cancelAction(new QAction(qApp->style()->standardIcon(QStyle::SP_ArrowBack), tr("Cancel"), this)),
-    _saveAction(new QAction(qApp->style()->standardIcon(QStyle::SP_DialogOkButton), tr("Save"), this))
+    _cancelAction(new QAction(qApp->style()->standardIcon(static_cast<QStyle::StandardPixmap>(SP_CustomToolBarBack)), tr("Cancel"), this)),
+    _saveAction(new QAction(qApp->style()->standardIcon(static_cast<QStyle::StandardPixmap>(SP_CustomToolBarDone)), tr("Save"), this))
 {
     _ui->setupUi(this);
     _ui->title->setText(_note->title());
@@ -23,16 +20,6 @@ NoteEditor::NoteEditor(Note *note, QWidget *parent):
     connect(_saveAction, SIGNAL(triggered()), this, SLOT(accept()));
 
     connect(this, SIGNAL(accepted()), this, SLOT(updateNote()));
-
-    // Workaround for QtSimulator
-#ifdef Q_WS_SIMULATOR
-    QPushButton *button = new QPushButton(tr("Cancel"), this);
-    _ui->verticalLayout->addWidget(button);
-    connect(button, SIGNAL(clicked()), this, SLOT(reject()));
-    button = new QPushButton(tr("Save"), this);
-    _ui->verticalLayout->addWidget(button);
-    connect(button, SIGNAL(clicked()), this, SLOT(accept()));
-#endif
 }
 
 NoteEditor::~NoteEditor()

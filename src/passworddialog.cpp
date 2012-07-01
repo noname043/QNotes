@@ -1,11 +1,11 @@
 #include "passworddialog.h"
-#include <QStyle>
+#include <QS60Style>
 
 PasswordDialog::PasswordDialog(QWidget *parent):
     QDialog(parent),
     _ui(new Ui::PasswordDialog),
-    _cancelAction(new QAction(qApp->style()->standardIcon(QStyle::SP_ArrowBack), tr("Cancel"), this)),
-    _okAction(new QAction(qApp->style()->standardIcon(QStyle::SP_DialogApplyButton), tr("Ok"), this))
+    _cancelAction(new QAction(qApp->style()->standardIcon(static_cast<QStyle::StandardPixmap>(SP_CustomToolBarBack)), tr("Cancel"), this)),
+    _okAction(new QAction(qApp->style()->standardIcon(static_cast<QStyle::StandardPixmap>(SP_CustomToolBarDone)), tr("Ok"), this))
 {
     _ui->setupUi(this);
 
@@ -19,17 +19,6 @@ PasswordDialog::PasswordDialog(QWidget *parent):
     connect(_okAction, SIGNAL(triggered()), this, SLOT(accept()));
     connect(_ui->password, SIGNAL(textEdited(QString)), this, SLOT(passwordChanged(QString)));
     connect(_ui->retype, SIGNAL(textEdited(QString)), this, SLOT(retypeChanged(QString)));
-
-    // Workaround for QtSimulator.
-#ifdef Q_WS_SIMULATOR
-    _button = new QPushButton(tr("Cancel"), this);
-    _ui->verticalLayout_3->addWidget(_button);
-    connect(_button, SIGNAL(clicked()), this, SLOT(reject()));
-    _button = new QPushButton(tr("Ok"), this);
-    _ui->verticalLayout_3->addWidget(_button);
-    connect(_button, SIGNAL(clicked()), this, SLOT(accept()));
-    _button->setEnabled(false);
-#endif
 }
 
 PasswordDialog::~PasswordDialog()
