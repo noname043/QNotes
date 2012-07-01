@@ -28,3 +28,7 @@ FORMS += \
     ui/noteeditor.ui \
     ui/passworddialog.ui \
     ui/getpassworddialog.ui
+
+symbian {
+    TARGET.CAPABILITY += ReadUserData WriteUserData
+}

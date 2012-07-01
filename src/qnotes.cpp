@@ -59,8 +59,10 @@ QNotes::QNotes(QWidget *parent):
             tmp = QDir::homePath();
         _settings.setValue(DBPATH, tmp);
     }
-    tmp += '/';
-    _db.setDatabaseName(tmp.append(DBFILE));
+    if (!tmp.endsWith('/'))
+        tmp += '/';
+    tmp += DBFILE;
+    _db.setDatabaseName(QDir::toNativeSeparators(tmp));
 }
 
 QNotes::~QNotes()
