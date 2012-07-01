@@ -1,5 +1,6 @@
 #include "getpassworddialog.h"
 #include <QS60Style>
+#include <QDesktopWidget>
 
 GetPasswordDialog::GetPasswordDialog(const QString &caption, const QString &label, QWidget *parent):
     QDialog(parent),
@@ -10,6 +11,13 @@ GetPasswordDialog::GetPasswordDialog(const QString &caption, const QString &labe
     _ui->setupUi(this);
     this->setWindowTitle(caption);
     _ui->label->setText(label);
+
+    int w, h;
+    h = height();
+    w = qApp->desktop()->screenGeometry().width();
+    if (w > qApp->desktop()->screenGeometry().height())
+        w = qApp->desktop()->screenGeometry().height();
+    this->resize(w, h);
 
     _cancelAction->setText(tr("Cancel"));
     _okAction->setText(tr("Ok"));
