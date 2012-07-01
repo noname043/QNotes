@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
 
     if (notes.hasPassword())
     {
-        // TODO: Replace QInputDialog with something that hides password.
         QString password = GetPasswordDialog::getPassword();
         if (password.isNull())
             return 0;

@@ -4,6 +4,7 @@
 #include <QSqlResult>
 #include <QCryptographicHash>
 #include <QMessageBox>
+#include <QFileDialog>
 #include "noteeditor.h"
 #include "passworddialog.h"
 
@@ -19,6 +20,7 @@ QNotes::QNotes(QWidget *parent):
     _disablePasswordAction(new QAction(tr("Disable"), this)),
     _aboutAction(new QAction(tr("About"), this)),
     _exitAction(new QAction(tr("Exit"), this)),
+    _settings(this),
     _db(QSqlDatabase::addDatabase("QSQLITE")),
     _hasPassword(false)
 {
@@ -46,7 +48,19 @@ QNotes::QNotes(QWidget *parent):
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(_ui->notesList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
 
-    _db.setDatabaseName(DBFILE);
+    QString tmp;
+    if (_settings.contains(DBPATH))
+        tmp = _settings.value(DBPATH).toString();
+    else
+    {
+        QMessageBox::information(this, "QNotes", tr("It's the first time you use QNotes. After this message you will be asked to choose directory where you want to keep your notes."));
+        tmp = QFileDialog::getExistingDirectory(this, tr("Choose directory where you want to keep your notes."));
+        if (tmp.isEmpty())
+            tmp = QDir::homePath();
+        _settings.setValue(DBPATH, tmp);
+    }
+    tmp += '/';
+    _db.setDatabaseName(tmp.append(DBFILE));
 }
 
 QNotes::~QNotes()

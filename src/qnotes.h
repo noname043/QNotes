@@ -6,10 +6,12 @@
 #include <QAction>
 #include <QSqlDatabase>
 #include <QFile>
+#include <QSettings>
 #include "note.h"
 #include "ui_qnotes.h"
 
 #define DBFILE "QNotes.db"
+#define DBPATH "DBPath"
 
 class QNotes: public QWidget
 {
@@ -54,6 +56,7 @@ private:
     QAction *_aboutAction;
     QAction *_exitAction;
 
+    QSettings _settings;
     QSqlDatabase _db;
     bool _hasPassword;
     QString _password;
