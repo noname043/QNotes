@@ -1,8 +1,9 @@
 #include <QApplication>
 #include <QMessageBox>
-#include <QInputDialog>
+//#include <QInputDialog> <- broken
 #include <QTextCodec>
 #include "qnotes.h"
+#include "getpassworddialog.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,6 +11,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("QNotes");
     app.setApplicationVersion("0.1");
     app.setOrganizationName("Noname043");
+    app.setAutoSipEnabled(true);
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
@@ -29,7 +31,7 @@ int main(int argc, char *argv[])
     if (notes.hasPassword())
     {
         // TODO: Replace QInputDialog with something that hides password.
-        QString password = QInputDialog::getText(0, QObject::tr("Enter password"), QObject::tr("Password:"), QLineEdit::Password);
+        QString password = GetPasswordDialog::getPassword();
         if (password.isNull())
             return 0;
         if (!notes.checkPassword(password))

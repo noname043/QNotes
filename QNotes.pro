@@ -13,15 +13,18 @@ SOURCES += src/main.cpp \
     src/qnotes.cpp \
     src/note.cpp \
     src/noteeditor.cpp \
-    src/passworddialog.cpp
+    src/passworddialog.cpp \
+    src/getpassworddialog.cpp
 
 HEADERS += \
     src/qnotes.h \
     src/note.h \
     src/noteeditor.h \
-    src/passworddialog.h
+    src/passworddialog.h \
+    src/getpassworddialog.h
 
 FORMS += \
     ui/qnotes.ui \
     ui/noteeditor.ui \
-    ui/passworddialog.ui
+    ui/passworddialog.ui \
+    ui/getpassworddialog.ui
