@@ -33,6 +33,8 @@ public:
 private slots:
     void addNote();
     void editNote(QListWidgetItem *item);
+    void deleteNote(QListWidgetItem *item);
+    void showDetails(QListWidgetItem *item);
     void enablePassword();
     void changePassword();
     void disablePassword();

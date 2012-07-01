@@ -50,6 +50,8 @@ QNotes::QNotes(QWidget *parent):
     connect(_exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(_noteList, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
     connect(_noteList, SIGNAL(editTriggered(QListWidgetItem*)), this, SLOT(editNote(QListWidgetItem*)));
+    connect(_noteList, SIGNAL(deleteTriggered(QListWidgetItem*)), this, SLOT(deleteNote(QListWidgetItem*)));
+    connect(_noteList, SIGNAL(detailsTriggered(QListWidgetItem*)), this, SLOT(showDetails(QListWidgetItem*)));
 
     QString tmp;
     if (_settings.contains(DBPATH))
@@ -315,4 +317,23 @@ void QNotes::updateNotes()
                .arg(note->title(), note->content(), QString::number(note->id())));
         decrypt(note);
     }
+}
+
+void QNotes::deleteNote(QListWidgetItem *item)
+{
+    if (QMessageBox::question(this, "QNotes", tr("Do you really want to delete this note?"), QMessageBox::Yes, QMessageBox::No)
+            == QMessageBox::Yes)
+    {
+        Note *note = dynamic_cast<Note*>(item);
+        _noteList->removeItemWidget(item);
+        QSqlQuery q;
+        q.exec(QString("DELETE FROM Notes WHERE id=%1").arg(QString::number(note->id())));
+        delete note;
+    }
+}
+
+void QNotes::showDetails(QListWidgetItem *item)
+{
+    Note *note = dynamic_cast<Note*>(item);
+    QMessageBox::information(this, "QNotes", QString("Created: %1<br>Modified: %2").arg(note->createdString(), note->modifiedString()));
 }
