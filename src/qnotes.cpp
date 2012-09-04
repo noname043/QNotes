@@ -177,7 +177,7 @@ void QNotes::addNote()
         _noteList->addItem(note);
         QSqlQuery q;
         //               v--- workaround for auto_increment, lol
-        q.exec("SELECT Count(1)+1 FROM Notes");
+        q.exec("SELECT Max(1)+1 FROM Notes");
         q.next();
         note->setId(q.value(0).toInt());
         if (note->title().isEmpty())
