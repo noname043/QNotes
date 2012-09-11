@@ -33,4 +33,5 @@ FORMS += \
 
 symbian {
     TARGET.CAPABILITY += ReadUserData WriteUserData
+    ICON = res/qnotes.svg
 }
