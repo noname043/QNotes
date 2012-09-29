@@ -40,6 +40,7 @@ QNotes::QNotes(QWidget *parent):
     _menu->addAction(_aboutAction);
     _menu->addAction(_exitAction);
     addAction(_menuAction);
+    addAction(_exitAction);
     _menuAction->setMenu(_menu);
     _menuAction->setIcon(qApp->style()->standardIcon(QStyle::SP_TitleBarMenuButton));
     _menuAction->setSoftKeyRole(QAction::PositiveSoftKey);
