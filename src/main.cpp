@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("QNotes");
     app.setApplicationVersion("0.1");
     app.setOrganizationName("Noname043");
-    app.setAutoSipEnabled(true);
+    app.setAttribute(Qt::AA_S60DisablePartialScreenInputMode, false);
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
