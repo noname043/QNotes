@@ -24,7 +24,7 @@ public:
     bool hasPassword() const { return _hasPassword; }
     bool checkPassword(const QString &password);
 
-    bool dbExists() const { return QFile::exists(DBFILE); }
+    bool dbExists() const { return QFile::exists(QString("%1/%2").arg(_settings.value(DBPATH).toString(), DBFILE)); }
     bool createDB();
     bool openDB();
 
