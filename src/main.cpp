@@ -17,6 +17,12 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     QNotes notes;
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    notes.showMaximized();
+#else
+    notes.show();
+#endif
+
     if (!notes.dbExists() && !notes.createDB())
     {
         QMessageBox::critical(0, QObject::tr("QNotes error"), QObject::tr("Unable to create QNotes database!"));
@@ -30,7 +36,7 @@ int main(int argc, char *argv[])
 
     if (notes.hasPassword())
     {
-        QString password = GetPasswordDialog::getPassword();
+        QString password = GetPasswordDialog::getPassword(&notes);
         if (password.isNull())
             return 0;
         if (!notes.checkPassword(password))
@@ -41,12 +47,6 @@ int main(int argc, char *argv[])
     }
 
     notes.loadNotes();
-
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-    notes.showMaximized();
-#else
-    notes.show();
-#endif
 
     return app.exec();
 }

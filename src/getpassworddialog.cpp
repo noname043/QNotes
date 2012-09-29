@@ -38,6 +38,7 @@ QString GetPasswordDialog::getPassword(QWidget *parent, const QString &caption, 
 {
     GetPasswordDialog *dialog = new GetPasswordDialog(caption, label, parent);
     QString tmp;
+    dialog->showMaximized();
     if (dialog->exec() == QDialog::Accepted)
         tmp = dialog->password();
     delete dialog;
