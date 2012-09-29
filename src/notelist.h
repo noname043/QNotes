@@ -1,11 +1,11 @@
 #ifndef NOTELIST_H
 #define NOTELIST_H
 
-#include <QListWidget>
 #include <QMenu>
 #include <QAction>
+#include "listwidget.h"
 
-class NoteList: public QListWidget
+class NoteList: public ListWidget
 {
     Q_OBJECT
 public:

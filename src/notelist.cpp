@@ -1,7 +1,7 @@
 #include "src/notelist.h"
 
 NoteList::NoteList(QWidget *parent):
-    QListWidget(parent),
+    ListWidget(parent),
     _menu(new QMenu(this)),
     _editAction(new QAction(tr("Edit"), this)),
     _deleteAction(new QAction(tr("Delete"), this)),
