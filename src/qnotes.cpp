@@ -5,6 +5,7 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QS60Style>
 #include "noteeditor.h"
 #include "passworddialog.h"
 
@@ -42,6 +43,10 @@ QNotes::QNotes(QWidget *parent):
     _menuAction->setMenu(_menu);
     _menuAction->setIcon(qApp->style()->standardIcon(QStyle::SP_TitleBarMenuButton));
     _menuAction->setSoftKeyRole(QAction::PositiveSoftKey);
+    _exitAction->setSoftKeyRole(QAction::NegativeSoftKey);
+#if QT_VERSION >= 0x040704
+    _exitAction->setIcon(qApp->style()->standardIcon(static_cast<QStyle::StandardPixmap>(SP_CustomToolBarBack)));
+#endif
 
     connect(_addNoteAction, SIGNAL(triggered()), this, SLOT(addNote()));
     connect(_enablePasswordAction, SIGNAL(triggered()), this, SLOT(enablePassword()));
@@ -179,7 +184,7 @@ void QNotes::addNote()
         _noteList->addItem(note);
         QSqlQuery q;
         //               v--- workaround for auto_increment, lol
-        q.exec("SELECT Max(1)+1 FROM Notes");
+        q.exec("SELECT Max(id)+1 FROM Notes");
         q.next();
         note->setId(q.value(0).toInt());
         if (note->title().isEmpty())
